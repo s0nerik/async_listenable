@@ -7,13 +7,19 @@
 [![async_listenable](https://img.shields.io/codecov/c/github/s0nerik/async_listenable)](https://app.codecov.io/github/s0nerik/async_listenable)
 
 Same as `ValueListenable`/`ValueNotifier`, but for `Stream` and `Future`.
-Allows for observing the `AsyncSnapshot` of an async operation.
+Allows for observing the `AsyncSnapshot` of an async operation outside the widget/element tree.
 
 ## Features
 
-- `AsyncListenable`: an interface for observing async operation state. Same as `ValueListenable`, but provides the `AsyncSnapshot`.
-- `AsyncListenableBuilder`: same as `ValueListenableBuilder`/`StreamBuilder`/`FutureBuilder`, but for `AsyncListenable`. Provides `AsyncSnapshot` as a value.
-- `AsyncNotifier`: tracks `Future` or `Stream` state and notifies listeners when it changes by providing an `AsyncSnapshot`.
+- `AsyncListenable`
+  - An interface for observing async operation state.
+  - Same as `ValueListenable`, but provides the `AsyncSnapshot`.
+- `AsyncListenableBuilder`
+  - Same as `ValueListenableBuilder`/`StreamBuilder`/`FutureBuilder`, but for `AsyncListenable`.
+  - Provides `AsyncSnapshot` as a value.
+- `AsyncNotifier`
+  - A mutable implementation of `AsyncListenable`.
+  - Tracks `Future` or `Stream` state and notifies listeners when it changes by providing an `AsyncSnapshot`.
 
 ## Usage
 
