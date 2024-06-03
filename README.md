@@ -32,7 +32,7 @@ final notifier = AsyncNotifier<int>()
   /// ...or with a stream
   ..setStream(Stream.value(42));
   /// ...or with a future/stream and an initial value
-  ..setFuture(Future.value(42), initialData: () => -1);
+  ..setFuture(Future.value(42), initialData: () => 0);
   /// ...or with a future/stream and an initial error
   ..setStream(Stream.error('error'), initialError: () => SomeException());
 
