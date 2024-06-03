@@ -1,10 +1,10 @@
 # async_listenable
 
+[![async_listenable](https://img.shields.io/codecov/c/github/s0nerik/async_listenable)](https://app.codecov.io/github/s0nerik/async_listenable)
 [![async_listenable](https://img.shields.io/pub/v/async_listenable)](https://pub.dev/packages/async_listenable)
 [![async_listenable](https://img.shields.io/pub/likes/async_listenable)](https://pub.dev/packages/async_listenable)
 [![async_listenable](https://img.shields.io/pub/points/async_listenable)](https://pub.dev/packages/async_listenable)
 [![async_listenable](https://img.shields.io/pub/popularity/async_listenable)](https://pub.dev/packages/async_listenable)
-[![async_listenable](https://img.shields.io/codecov/c/github/s0nerik/async_listenable)](https://app.codecov.io/github/s0nerik/async_listenable)
 
 Same as `ValueListenable`/`ValueNotifier`, but for `Stream` and `Future`.
 Allows for observing the `AsyncSnapshot` of an async operation outside the widget/element tree.
