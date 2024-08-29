@@ -6,8 +6,8 @@ import 'async_listenable.dart';
 
 /// A [ChangeNotifier] that holds a current state of asynchronous computation.
 ///
-/// When [setFuture] or [setStream] is called, the [AsyncNotifier] will notify
-/// its listeners with the latest [AsyncSnapshot] of it.
+/// When [set], [setFuture] or [setStream] is called, the [AsyncNotifier] will
+/// notify its listeners with the latest [AsyncSnapshot] of it.
 class AsyncNotifier<T> with ChangeNotifier implements AsyncListenable<T> {
   final _emptySnapshot = AsyncSnapshot<T>.nothing();
 
@@ -19,6 +19,39 @@ class AsyncNotifier<T> with ChangeNotifier implements AsyncListenable<T> {
   Future<T>? _future;
   Stream<T>? _stream;
   StreamSubscription<T>? _streamSubscription;
+
+  /// Track a [FutureOr] and notify listeners with the latest [AsyncSnapshot]
+  /// of it. If [futureOrValue] is not a [Future], the [snapshot] will be
+  /// transitioned to [ConnectionState.done] with the provided value synchronously.
+  ///
+  /// If [initialData] or [initialError] is provided, the [snapshot] will be
+  /// in the [ConnectionState.waiting] state with the provided data/error until
+  /// the [future] completes, unless the [future] completes synchronously
+  /// (e.g. [SynchronousFuture]).
+  ///
+  /// By default, the data/error of a previous [snapshot] will be preserved
+  /// until the [future] completes. This can be changed by setting
+  /// [resetSnapshot] to true.
+  void set(
+    FutureOr<T> futureOrValue, {
+    T Function()? initialData,
+    (Object, StackTrace?) Function()? initialError,
+    bool resetSnapshot = false,
+  }) {
+    if (futureOrValue is T) {
+      _future = null;
+      _updateSnapshot(
+        AsyncSnapshot<T>.withData(ConnectionState.done, futureOrValue),
+      );
+      return;
+    }
+    return setFuture(
+      futureOrValue,
+      initialData: initialData,
+      initialError: initialError,
+      resetSnapshot: resetSnapshot,
+    );
+  }
 
   /// Track a [Future] and notify listeners with the latest [AsyncSnapshot]
   /// of it.

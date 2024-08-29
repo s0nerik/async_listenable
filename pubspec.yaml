@@ -1,6 +1,6 @@
 name: async_listenable
 description: ValueListenable/ValueNotifier for async operations
-version: 1.0.1
+version: 1.1.0
 homepage: https://github.com/s0nerik/async_listenable
 repository: https://github.com/s0nerik/async_listenable
 topics:
@@ -10,7 +10,7 @@ topics:
   - state-management
 
 environment:
-  sdk: '>=3.3.0 <4.0.0'
+  sdk: '>=3.0.0 <4.0.0'
   flutter: ">=1.17.0"
 
 dependencies:

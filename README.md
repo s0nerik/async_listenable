@@ -29,6 +29,10 @@ Allows for observing the `AsyncSnapshot` of an async operation outside the widge
 final notifier = AsyncNotifier<int>()
   /// initialize it right away with a future
   ..setFuture(Future.value(42));
+  /// ...or with a [SynchronousFuture] (for synchronous initialization)
+  ..set(SynchronousFuture(42));
+  /// ...or with a value (for synchronous initialization)
+  ..set(42);
   /// ...or with a stream
   ..setStream(Stream.value(42));
   /// ...or with a future/stream and an initial value
@@ -36,12 +40,20 @@ final notifier = AsyncNotifier<int>()
   /// ...or with a future/stream and an initial error
   ..setStream(Stream.error('error'), initialError: () => SomeException());
 
-/// Replace the future/stream with a new one.
-notifier.setFuture(Future.value(42));
-
-/// By default, [setFuture] and [setStream] will will_not reset the data/error
-/// state of a [snapshot] until the new future/stream emits something.
+/// Replace the future/stream with a new Future.
+notifier.set(Future.value(42));
+/// ...or with a synchronous future (for synchronous snapshot update)
+notifier.set(SynchronousFuture(42));
+/// ...or with a value (for synchronous snapshot update)
+notifier.set(42);
+/// ...or with a stream
+///
+/// By default, [set], [setFuture] and [setStream] will will_not reset the
+/// data/error state of a [snapshot] until the new future/stream emits something.
 /// If you want to fully reset the snapshot state, pass [resetSnapshot: true].
+/// 
+/// If stream emits the initial value/error synchronously, the [snapshot] will
+/// be updated synchronously.
 notifier.setStream(Stream.value(42), resetSnapshot: true);
 
 /// Get the current snapshot.

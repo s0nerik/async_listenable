@@ -14,6 +14,7 @@ void main() {
       final future = Future.value(42);
       notifier.setFuture(future);
       expect(notifier.snapshot.connectionState, ConnectionState.waiting);
+      expect(notifier.snapshot.data, null);
 
       await future;
       expect(notifier.snapshot.connectionState, ConnectionState.done);
@@ -25,6 +26,7 @@ void main() {
       final future = Future<int>.error('error');
       notifier.setFuture(future);
       expect(notifier.snapshot.connectionState, ConnectionState.waiting);
+      expect(notifier.snapshot.error, null);
 
       try {
         await future;
@@ -33,13 +35,77 @@ void main() {
       expect(notifier.snapshot.error, 'error');
     });
     test(
-      'setFuture(SynchronousFuture) updates the snapshot synchronously',
+      'setFuture(SynchronousFuture) initializes the snapshot synchronously',
       () {
         final notifier = AsyncNotifier<int>();
         final future = SynchronousFuture(42);
         notifier.setFuture(future);
         expect(notifier.snapshot.connectionState, ConnectionState.done);
         expect(notifier.snapshot.data, 42);
+      },
+    );
+    test(
+      'setFuture(SynchronousFuture) updates the snapshot synchronously',
+      () async {
+        final notifier = AsyncNotifier<int>();
+        final future = Future.value(42);
+        notifier.setFuture(future);
+        await future;
+        expect(notifier.snapshot.connectionState, ConnectionState.done);
+        expect(notifier.snapshot.data, 42);
+
+        notifier.setFuture(SynchronousFuture(43));
+        expect(notifier.snapshot.connectionState, ConnectionState.done);
+        expect(notifier.snapshot.data, 43);
+
+        notifier.setFuture(SynchronousFuture(44));
+        expect(notifier.snapshot.connectionState, ConnectionState.done);
+        expect(notifier.snapshot.data, 44);
+      },
+    );
+    test(
+      'set(T) initializes the snapshot synchronously',
+      () {
+        final notifier = AsyncNotifier<int>();
+        notifier.set(42);
+        expect(notifier.snapshot.connectionState, ConnectionState.done);
+        expect(notifier.snapshot.data, 42);
+      },
+    );
+    test(
+      'set(Future<T>) initializes the snapshot asynchronously',
+      () async {
+        final notifier = AsyncNotifier<int>();
+        final future = Future.value(42);
+        notifier.set(future);
+        expect(notifier.snapshot.connectionState, ConnectionState.waiting);
+        expect(notifier.snapshot.data, null);
+
+        await future;
+        expect(notifier.snapshot.connectionState, ConnectionState.done);
+        expect(notifier.snapshot.data, 42);
+      },
+    );
+    test(
+      'set(T) can be replaced with set(Future<T>) or set(SynchronousFuture<T>)',
+      () async {
+        final notifier = AsyncNotifier<int>();
+        notifier.set(42);
+        expect(notifier.snapshot.connectionState, ConnectionState.done);
+        expect(notifier.snapshot.data, 42);
+
+        final future = Future.value(43);
+        notifier.set(future);
+        expect(notifier.snapshot.connectionState, ConnectionState.waiting);
+        expect(notifier.snapshot.data, 42); // prev data is preserved by default
+        await future;
+        expect(notifier.snapshot.connectionState, ConnectionState.done);
+        expect(notifier.snapshot.data, 43);
+
+        final synchronousFuture = SynchronousFuture(44);
+        notifier.set(synchronousFuture);
+        expect(notifier.snapshot.connectionState, ConnectionState.done);
+        expect(notifier.snapshot.data, 44);
       },
     );
     test(
