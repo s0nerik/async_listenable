@@ -28,7 +28,7 @@ Allows for observing the `AsyncSnapshot` of an async operation outside the widge
 /// until the future/stream is set.
 final notifier = AsyncNotifier<int>()
   /// initialize it right away with a future
-  ..setFuture(Future.value(42));
+  ..set(Future.value(42));
   /// ...or with a [SynchronousFuture] (for synchronous initialization)
   ..set(SynchronousFuture(42));
   /// ...or with a value (for synchronous initialization)

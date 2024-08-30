@@ -1,3 +1,7 @@
+## 1.2.0
+
+- `AsyncListenable<T>` now implements `ValueListenable<AsyncSnapshot<T>>`.
+
 ## 1.1.0
 
 - Added `set(FutureOr<T>)` method to `AsyncNotifier` for synchronous

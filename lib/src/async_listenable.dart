@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 /// An interface for subclasses of [Listenable] that expose a [snapshot].
@@ -11,7 +12,8 @@ import 'package:flutter/widgets.dart';
 ///  * [AsyncListenableBuilder], a widget that uses a builder callback to
 ///    rebuild whenever a [AsyncListenable] object triggers its notifications,
 ///    providing the builder with the current snapshot of the [AsyncListenable].
-abstract interface class AsyncListenable<T> implements Listenable {
+abstract interface class AsyncListenable<T>
+    implements ValueListenable<AsyncSnapshot<T>> {
   /// The current state of the [AsyncListenable].
   AsyncSnapshot<T> get snapshot;
 }
