@@ -365,6 +365,24 @@ void main() {
     expect(notifier.snapshot.connectionState, ConnectionState.none);
     expect(notifier.snapshot.data, 42);
   });
+  test('AsyncListenable<T> is also a ValueListenable<AsyncSnapshot<T>>',
+      () async {
+    final notifier = AsyncNotifier<int>();
+    final listenable = notifier as ValueListenable<AsyncSnapshot<int>>;
+    expect(listenable.value, notifier.snapshot);
+
+    notifier.set(Future.value(42));
+    expect(listenable.value, notifier.snapshot);
+
+    await Future.value(); // wait for the future to complete
+    expect(listenable.value, notifier.snapshot);
+
+    notifier.setStream(Stream.value(43));
+    expect(listenable.value, notifier.snapshot);
+
+    await Future.value(); // wait for the stream to complete
+    expect(listenable.value, notifier.snapshot);
+  });
 }
 
 class _SynchronousStreamView<T> extends StreamView<T> {

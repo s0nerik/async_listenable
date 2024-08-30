@@ -16,6 +16,9 @@ class AsyncNotifier<T> with ChangeNotifier implements AsyncListenable<T> {
   AsyncSnapshot<T> get snapshot => _snapshot;
   late AsyncSnapshot<T> _snapshot = _emptySnapshot;
 
+  @override
+  AsyncSnapshot<T> get value => _snapshot;
+
   Future<T>? _future;
   Stream<T>? _stream;
   StreamSubscription<T>? _streamSubscription;
