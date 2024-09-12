@@ -212,6 +212,40 @@ void main() {
         expect(notifier.snapshot.data, 43);
       }),
     );
+    test(
+      'set/setFuture(rethrowOnError: true) will also rethrow the error into the enclosing zone',
+      () => fakeAsync((async) {
+        late Object receivedError;
+        late StackTrace receivedTrace;
+
+        runZonedGuarded(() {
+          final notifier = AsyncNotifier<int>();
+
+          final error = Exception('error');
+          final trace = StackTrace.current;
+          final future = Future<int>.error(error, trace);
+
+          notifier.setFuture(future, rethrowOnError: true);
+          async.flushMicrotasks();
+          expect(receivedError, error);
+          expect(receivedTrace, trace);
+
+          notifier.set(future, rethrowOnError: true);
+          async.flushMicrotasks();
+          expect(receivedError, error);
+          expect(receivedTrace, trace);
+
+          final stream = Stream<int>.error(error, trace);
+          notifier.setStream(stream, rethrowOnError: true);
+          async.flushMicrotasks();
+          expect(receivedError, error);
+          expect(receivedTrace, trace);
+        }, (error, trace) {
+          receivedError = error;
+          receivedTrace = trace;
+        });
+      }),
+    );
   });
   group('Stream', () {
     test(

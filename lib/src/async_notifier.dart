@@ -40,6 +40,7 @@ class AsyncNotifier<T> with ChangeNotifier implements AsyncListenable<T> {
     T Function()? initialData,
     (Object, StackTrace?) Function()? initialError,
     bool resetSnapshot = false,
+    bool rethrowOnError = false,
   }) {
     if (futureOrValue is T) {
       _future = null;
@@ -53,6 +54,7 @@ class AsyncNotifier<T> with ChangeNotifier implements AsyncListenable<T> {
       initialData: initialData,
       initialError: initialError,
       resetSnapshot: resetSnapshot,
+      rethrowOnError: rethrowOnError,
     );
   }
 
@@ -72,6 +74,7 @@ class AsyncNotifier<T> with ChangeNotifier implements AsyncListenable<T> {
     T Function()? initialData,
     (Object, StackTrace?) Function()? initialError,
     bool resetSnapshot = false,
+    bool rethrowOnError = false,
   }) {
     assert(
       initialData == null && initialError == null ||
@@ -94,6 +97,10 @@ class AsyncNotifier<T> with ChangeNotifier implements AsyncListenable<T> {
       newSnapshot =
           AsyncSnapshot<T>.withError(ConnectionState.done, error, stackTrace);
       _updateSnapshot(newSnapshot!);
+
+      if (rethrowOnError) {
+        Error.throwWithStackTrace(error, stackTrace);
+      }
     });
 
     // An implementation like `SynchronousFuture` may have already called the
@@ -123,6 +130,7 @@ class AsyncNotifier<T> with ChangeNotifier implements AsyncListenable<T> {
     T Function()? initialData,
     (Object, StackTrace?) Function()? initialError,
     bool resetSnapshot = false,
+    bool rethrowOnError = false,
   }) {
     assert(
       initialData == null && initialError == null ||
@@ -146,6 +154,10 @@ class AsyncNotifier<T> with ChangeNotifier implements AsyncListenable<T> {
       newSnapshot =
           AsyncSnapshot<T>.withError(ConnectionState.active, error, stackTrace);
       _updateSnapshot(newSnapshot!);
+
+      if (rethrowOnError) {
+        Error.throwWithStackTrace(error, stackTrace);
+      }
     }, onDone: () {
       if (_stream != stream) return;
 
