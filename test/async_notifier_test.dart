@@ -24,7 +24,7 @@ void main() {
         () async {
       final notifier = AsyncNotifier<int>();
       final future = Future<int>.error('error');
-      notifier.setFuture(future);
+      expect(() => notifier.setFuture(future), throwsA(isA<Object>()));
       expect(notifier.snapshot.connectionState, ConnectionState.waiting);
       expect(notifier.snapshot.error, null);
 
@@ -126,7 +126,13 @@ void main() {
         () async {
       final notifier = AsyncNotifier<int>();
       final future = Future<int>.error('error');
-      notifier.setFuture(future, initialError: () => ('initialError', null));
+      expect(
+        () => notifier.setFuture(
+          future,
+          initialError: () => ('initialError', null),
+        ),
+        throwsA(isA<Object>()),
+      );
       expect(notifier.snapshot.connectionState, ConnectionState.waiting);
       expect(notifier.snapshot.error, 'initialError');
 
@@ -210,6 +216,43 @@ void main() {
         async.elapse(const Duration(milliseconds: 500));
         expect(notifier.snapshot.connectionState, ConnectionState.done);
         expect(notifier.snapshot.data, 43);
+      }),
+    );
+    test(
+      'set/setFuture() will also rethrow the error if future is rejected',
+      () => fakeAsync((async) {
+        late Object receivedError;
+        late StackTrace receivedTrace;
+
+        final notifier = AsyncNotifier<int>();
+
+        final error = Exception('error');
+        final trace = StackTrace.current;
+        final future = Future<int>.error(error, trace);
+
+        () async {
+          try {
+            await notifier.setFuture(future);
+          } catch (e, trace) {
+            receivedError = e;
+            receivedTrace = trace;
+          }
+        }();
+        async.flushMicrotasks();
+        expect(receivedError, error);
+        expect(receivedTrace, trace);
+
+        () async {
+          try {
+            await notifier.set(future);
+          } catch (e, trace) {
+            receivedError = e;
+            receivedTrace = trace;
+          }
+        }();
+        async.flushMicrotasks();
+        expect(receivedError, error);
+        expect(receivedTrace, trace);
       }),
     );
   });

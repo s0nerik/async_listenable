@@ -35,7 +35,7 @@ class AsyncNotifier<T> with ChangeNotifier implements AsyncListenable<T> {
   /// By default, the data/error of a previous [snapshot] will be preserved
   /// until the [future] completes. This can be changed by setting
   /// [resetSnapshot] to true.
-  void set(
+  FutureOr<T> set(
     FutureOr<T> futureOrValue, {
     T Function()? initialData,
     (Object, StackTrace?) Function()? initialError,
@@ -46,7 +46,7 @@ class AsyncNotifier<T> with ChangeNotifier implements AsyncListenable<T> {
       _updateSnapshot(
         AsyncSnapshot<T>.withData(ConnectionState.done, futureOrValue),
       );
-      return;
+      return futureOrValue;
     }
     return setFuture(
       futureOrValue,
@@ -67,7 +67,7 @@ class AsyncNotifier<T> with ChangeNotifier implements AsyncListenable<T> {
   /// By default, the data/error of a previous [snapshot] will be preserved
   /// until the [future] completes. This can be changed by setting
   /// [resetSnapshot] to true.
-  void setFuture(
+  Future<T> setFuture(
     Future<T> future, {
     T Function()? initialData,
     (Object, StackTrace?) Function()? initialError,
@@ -83,28 +83,31 @@ class AsyncNotifier<T> with ChangeNotifier implements AsyncListenable<T> {
     _future = future;
 
     AsyncSnapshot<T>? newSnapshot;
-    future.then((data) {
-      if (_future != future) return;
+    final resultFuture = future.then((data) {
+      if (_future != future) return future;
 
       newSnapshot = AsyncSnapshot<T>.withData(ConnectionState.done, data);
       _updateSnapshot(newSnapshot!);
+      return future;
     }, onError: (Object error, StackTrace stackTrace) {
-      if (_future != future) return;
+      if (_future != future) return future;
 
       newSnapshot =
           AsyncSnapshot<T>.withError(ConnectionState.done, error, stackTrace);
       _updateSnapshot(newSnapshot!);
+      return future;
     });
 
     // An implementation like `SynchronousFuture` may have already called the
     // .then closure. Do not overwrite it in that case.
-    if (newSnapshot != null) return;
+    if (newSnapshot != null) return resultFuture;
 
     _initializeSnapshot(
       initialData: initialData,
       initialError: initialError,
       resetSnapshot: resetSnapshot,
     );
+    return resultFuture;
   }
 
   /// Track a [Stream] and notify listeners with the latest [AsyncSnapshot]
